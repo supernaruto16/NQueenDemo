@@ -40,4 +40,8 @@ public:
 	afx_msg void OnBnClickedButton1();
 	CString m_ResultBox;
 	int m_Board_Size;
+	int m_Population_Size;
+	int m_Generation_Limit;
+	double m_CrossOverProbabilty;
+	double m_MutationProbabilty;
 };

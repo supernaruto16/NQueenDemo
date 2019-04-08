@@ -6,11 +6,12 @@ class GASolver
 {
 private:
 	int m_Board_Size = 8;
+	int m_Population_Size = 1000;
+	int m_GenerationLimit = 100;
 	int m_BadPopulation;
 	int m_SumFitness;
 	double m_CrossOverProbability = 0.8;
 	double m_MutationProbability = 0.25;
-	int m_GenerationLimit = 1000;
 
 	struct Gene {
 		std::vector<int> queensPos;
@@ -24,16 +25,17 @@ private:
 
 public:
 	GASolver();
+	GASolver(int boardSize, int populationSize, int generationLimit, double crossOverProbabilty, double mutationProbabilty);
 	void SetBoardSize(int n);
 	int GetFitness(Gene &curGene);
 	int GetSumFitness();
 	static bool fitnessCMP(const Gene &a, const Gene &b);
 	long long Rand(long long a, long long b);
-	int GetSelectionProbabilty(Gene &curGene);
+	double GetSelectionProbabilty(Gene &curGene);
 	void GenerateCumulativeDistribution();
 	void GeneratePopulation(int size = 1000);
-	Gene GetParentFromBad(double prev);
-	Gene GetParentFromMain(double prev);
+	Gene GetParentFromBad(int prevIdx, int &resIdx);
+	Gene GetParentFromMain(int prevIdx, int& resIdx);
 	void CrossOver();
 	Gene CrossOverMethod(Gene pA, Gene pB);
 	void Mutation(Gene &curGene);

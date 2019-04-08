@@ -55,6 +55,10 @@ CNQueenDemoDlg::CNQueenDemoDlg(CWnd* pParent /*=nullptr*/)
 	, instance(new GASolver)
 	, m_ResultBox(_T(""))
 	, m_Board_Size(0)
+	, m_Population_Size(0)
+	, m_Generation_Limit(0)
+	, m_CrossOverProbabilty(0)
+	, m_MutationProbabilty(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -64,6 +68,10 @@ void CNQueenDemoDlg::DoDataExchange(CDataExchange* pDX)
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Text(pDX, IDC_EDIT2, m_ResultBox);
 	DDX_Text(pDX, IDC_EDIT1, m_Board_Size);
+	DDX_Text(pDX, IDC_EDIT3, m_Population_Size);
+	DDX_Text(pDX, IDC_EDIT5, m_Generation_Limit);
+	DDX_Text(pDX, IDC_EDIT6, m_CrossOverProbabilty);
+	DDX_Text(pDX, IDC_EDIT7, m_MutationProbabilty);
 }
 
 BEGIN_MESSAGE_MAP(CNQueenDemoDlg, CDialogEx)
@@ -106,6 +114,12 @@ BOOL CNQueenDemoDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
+	m_Board_Size = 8;
+	m_Population_Size = 1000;
+	m_Generation_Limit = 100;
+	m_CrossOverProbabilty = 0.8;
+	m_MutationProbabilty = 0.25;
+	UpdateData(0);
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -162,16 +176,16 @@ HCURSOR CNQueenDemoDlg::OnQueryDragIcon()
 
 void CNQueenDemoDlg::LockControls()
 {
-	auto pEditBox1 = GetDlgItem(IDC_EDIT1);
-	pEditBox1->EnableWindow(0);
+	//auto pEditBox1 = GetDlgItem(IDC_EDIT1);
+	//pEditBox1->EnableWindow(0);
 	auto pButton1 = GetDlgItem(IDC_BUTTON1);
 	pButton1->EnableWindow(0);
 }
 
 void CNQueenDemoDlg::UnlockControls()
 {
-	auto pEditBox1 = GetDlgItem(IDC_EDIT1);
-	pEditBox1->EnableWindow();
+	//auto pEditBox1 = GetDlgItem(IDC_EDIT1);
+	//pEditBox1->EnableWindow();
 	auto pButton1 = GetDlgItem(IDC_BUTTON1);
 	pButton1->EnableWindow();
 }
@@ -185,21 +199,31 @@ void CNQueenDemoDlg::OnBnClickedButton1()
 	m_ResultBox = _T("");
 	UpdateData(0);
 
-	instance->Reset();
-	instance->SetBoardSize(m_Board_Size);
+	auto oldInstance = instance;
+	delete oldInstance;
+	instance = new GASolver(m_Board_Size, m_Population_Size, m_Generation_Limit, m_CrossOverProbabilty, m_MutationProbabilty);;
+
 	instance->Run();
 	std::vector<int> res = instance->GetResult();
 
+	CFont* myFont = new CFont();
+	myFont->CreateFont(16, 0, 0, 0, FW_NORMAL, false, true,
+		0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+		FIXED_PITCH | FF_MODERN, _T("Dejavu Sans Mono"));
+	auto pResultBox = GetDlgItem(IDC_EDIT2);
+	pResultBox->SetFont(myFont);
+
 	if (res.empty()) {
 		m_ResultBox = _T("Solution not found! Try again");
-
 	}
 	else {
 		for (int i = 0; i < m_Board_Size; i++) {
 			for (int j = 0; j < m_Board_Size; j++) {
 				if (res[j] == m_Board_Size - 1 - i)
-					m_ResultBox += _T("Q");
-				else m_ResultBox += _T("*");
+					m_ResultBox += _T(" Q |");
+				else if ((i + j) % 2 == 1)
+					m_ResultBox += _T(" - |");
+				else m_ResultBox += _T("   |");
 			}
 			m_ResultBox += _T("\r\n");
 		}
