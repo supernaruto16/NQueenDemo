@@ -19,6 +19,7 @@ GASolver::GASolver(int boardSize, int populationSize, int generationLimit, doubl
 	m_GenerationLimit = generationLimit;
 	m_CrossOverProbability = crossOverProbabilty;
 	m_MutationProbability = mutationProbabilty;
+	int m_BadPopulation = sqrt(m_Population_Size);
 }
 
 void GASolver::SetBoardSize(int n)
@@ -204,18 +205,22 @@ GASolver::Gene GASolver::CrossOverMethod(Gene pA, Gene pB)
 	Gene resGene;
 	int l = Rand(0, pA.queensPos.size() - 3);
 	int r = Rand(l + 2, pA.queensPos.size() - 1);
-	std::map<int, bool> used;
 	for (int i = l; i <= r; i++)
-		used[pA.queensPos[i]] = true;
+		m_bUsedPos[pA.queensPos[i]] = true;
+	
 	for (int i = 0, j = 0; resGene.queensPos.size() < pA.queensPos.size(); i++) {
 		if (l <= i && i <= r)
 			resGene.queensPos.push_back(pA.queensPos[i]);
-		else if (j < pB.queensPos.size() && !used[pB.queensPos[j]]) {
+		else if (j < pB.queensPos.size() && !m_bUsedPos[pB.queensPos[j]]) {
 			resGene.queensPos.push_back(pB.queensPos[j]);
 			j++;
 		}
 		else if(j + 1 < pB.queensPos.size()) j++;
 	}
+
+	for (int i = l; i <= r; i++)
+		m_bUsedPos[pA.queensPos[i]] = false;
+
 	return resGene;
 }
 
@@ -250,6 +255,7 @@ void GASolver::CreateNewGeneration()
 
 bool GASolver::CheckStopCrt()
 {
+	if (genCnt == m_GenerationLimit) return true;
 	for (int i = 0; i < m_Population.size(); i++)
 		if (m_Population[i].fitness == 0) {
 			m_Result = m_Population[i].queensPos;
@@ -262,12 +268,9 @@ void GASolver::Run()
 {	
 	m_Result.clear();
 	srand(time(NULL));
-	GeneratePopulation(100);
-	int genCnt = 0;
-	while (!CheckStopCrt() && genCnt <= m_GenerationLimit) {
-		CreateNewGeneration();
-		genCnt++;
-	}
+	GeneratePopulation(m_Population_Size);
+	genCnt++;
+	CreateNewGeneration();
 }
 
 void GASolver::Reset()
@@ -275,6 +278,7 @@ void GASolver::Reset()
 	m_Population.clear();
 	m_ChildPopulation.clear();
 	m_Result.clear();
+	genCnt = 0;
 }
 
 std::vector<int> GASolver::GetResult()

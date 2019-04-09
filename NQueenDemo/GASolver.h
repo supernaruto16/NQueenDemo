@@ -8,10 +8,11 @@ private:
 	int m_Board_Size = 8;
 	int m_Population_Size = 1000;
 	int m_GenerationLimit = 100;
-	int m_BadPopulation;
+	int m_BadPopulation = sqrt(m_Population_Size);
 	int m_SumFitness;
 	double m_CrossOverProbability = 0.8;
 	double m_MutationProbability = 0.25;
+	bool m_bUsedPos[1000] = { 0 };
 
 	struct Gene {
 		std::vector<int> queensPos;
@@ -26,6 +27,7 @@ private:
 public:
 	GASolver();
 	GASolver(int boardSize, int populationSize, int generationLimit, double crossOverProbabilty, double mutationProbabilty);
+	int genCnt = 0;
 	void SetBoardSize(int n);
 	int GetFitness(Gene &curGene);
 	int GetSumFitness();
