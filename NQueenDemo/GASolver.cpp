@@ -20,6 +20,7 @@ GASolver::GASolver(int boardSize, int populationSize, int generationLimit, doubl
 	m_CrossOverProbability = crossOverProbabilty;
 	m_MutationProbability = mutationProbabilty;
 	int m_BadPopulation = sqrt(m_Population_Size);
+
 }
 
 void GASolver::SetBoardSize(int n)
@@ -49,17 +50,17 @@ int GASolver::GetFitness(Gene &curGene)
 
 void GASolver::GeneratePopulation(int size)
 {
-	Gene zero;
+	std:: vector<int> zero;
 	for (int i = 0; i < m_Board_Size; i++)
-		zero.queensPos.push_back(i);
+		zero.push_back(i);
 
 	for (int i = 0; i < size; i++) {
 		Gene newGene;
-		newGene.queensPos = zero.queensPos;
+		newGene.queensPos = zero;
 		newGene.fitness = GetFitness(newGene);
 		m_Population.push_back(newGene);
 
-		std::random_shuffle(zero.queensPos.begin(), zero.queensPos.end());
+		std::random_shuffle(zero.begin(), zero.end());
 	}
 	m_BadPopulation = floor(sqrt(size));
 }
@@ -162,7 +163,6 @@ void GASolver::CrossOver()
 
 		r = (double)Rand(0, 1000000) / 1000000.0;
 		if (r <= m_MutationProbability) Mutation(childC);
-		GetFitness(childC);
 		m_ChildPopulation.push_back(childC);
 	}
 
@@ -178,7 +178,6 @@ void GASolver::CrossOver()
 
 		r = (double)Rand(0, 1000000) / 1000000.0;
 		if (r <= m_MutationProbability) Mutation(childC);
-		GetFitness(childC);
 		m_ChildPopulation.push_back(childC);
 	}
 
@@ -194,7 +193,6 @@ void GASolver::CrossOver()
 
 		r = (double)Rand(0, 1000000) / 1000000.0;
 		if (r <= m_MutationProbability) Mutation(childC);
-		GetFitness(childC);
 		m_ChildPopulation.push_back(childC);
 	}
 }
@@ -218,6 +216,7 @@ GASolver::Gene GASolver::CrossOverMethod(Gene pA, Gene pB)
 		else if(j + 1 < pB.queensPos.size()) j++;
 	}
 
+	GetFitness(resGene);
 	for (int i = l; i <= r; i++)
 		m_bUsedPos[pA.queensPos[i]] = false;
 
@@ -229,6 +228,7 @@ void GASolver::Mutation(Gene &curGene)
 	int i = Rand(0, curGene.queensPos.size() - 2);
 	int j = Rand(i+1, curGene.queensPos.size() - 1);
 	std::swap(curGene.queensPos[i], curGene.queensPos[j]);
+	GetFitness(curGene);
 }
 
 void GASolver::CreateNewGeneration()
@@ -248,7 +248,7 @@ void GASolver::CreateNewGeneration()
 			resPopulation.push_back(m_ChildPopulation[j]);
 			j--;
 		}
-		if (resPopulation.size() == m_Population.size()) break;
+		if (resPopulation.size() == m_Population_Size) break;
 	}
 	m_Population = resPopulation;
 }
@@ -268,7 +268,6 @@ void GASolver::Run()
 {	
 	m_Result.clear();
 	srand(time(NULL));
-	GeneratePopulation(m_Population_Size);
 	genCnt++;
 	CreateNewGeneration();
 }
@@ -278,6 +277,8 @@ void GASolver::Reset()
 	m_Population.clear();
 	m_ChildPopulation.clear();
 	m_Result.clear();
+	
+	GeneratePopulation(m_Population_Size);
 	genCnt = 0;
 }
 
