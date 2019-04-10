@@ -132,7 +132,7 @@ BOOL CNQueenDemoDlg::OnInitDialog()
 	CFont* myFont = new CFont();
 	myFont->CreateFont(16, 0, 0, 0, FW_NORMAL, false, true,
 		0, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
-		FIXED_PITCH | FF_MODERN, _T("Dejavu Sans Mono"));
+		FIXED_PITCH | FF_MODERN, _T("Consolas"));
 	auto pResultBox = GetDlgItem(IDC_EDIT2);
 	pResultBox->SetFont(myFont);
 

@@ -1,28 +1,5 @@
-﻿  pch.cpp
-  GASolver.cpp
-C:\Users\super\source\repos\NQueenDemo\NQueenDemo\GASolver.h(11): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-C:\Users\super\source\repos\NQueenDemo\NQueenDemo\GASolver.cpp(22): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-C:\Users\super\source\repos\NQueenDemo\NQueenDemo\GASolver.cpp(36): warning C4018: '<': signed/unsigned mismatch
-C:\Users\super\source\repos\NQueenDemo\NQueenDemo\GASolver.cpp(42): warning C4018: '<': signed/unsigned mismatch
-C:\Users\super\source\repos\NQueenDemo\NQueenDemo\GASolver.cpp(64): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-C:\Users\super\source\repos\NQueenDemo\NQueenDemo\GASolver.cpp(71): warning C4018: '<': signed/unsigned mismatch
-C:\Users\super\source\repos\NQueenDemo\NQueenDemo\GASolver.cpp(99): warning C4018: '<': signed/unsigned mismatch
-C:\Users\super\source\repos\NQueenDemo\NQueenDemo\GASolver.cpp(154): warning C4018: '<': signed/unsigned mismatch
-C:\Users\super\source\repos\NQueenDemo\NQueenDemo\GASolver.cpp(186): warning C4018: '<': signed/unsigned mismatch
-C:\Users\super\source\repos\NQueenDemo\NQueenDemo\GASolver.cpp(206): warning C4244: 'initializing': conversion from '__int64' to 'int', possible loss of data
-C:\Users\super\source\repos\NQueenDemo\NQueenDemo\GASolver.cpp(207): warning C4244: 'initializing': conversion from '__int64' to 'int', possible loss of data
-C:\Users\super\source\repos\NQueenDemo\NQueenDemo\GASolver.cpp(214): warning C4018: '<': signed/unsigned mismatch
-C:\Users\super\source\repos\NQueenDemo\NQueenDemo\GASolver.cpp(218): warning C4018: '<': signed/unsigned mismatch
-C:\Users\super\source\repos\NQueenDemo\NQueenDemo\GASolver.cpp(229): warning C4244: 'initializing': conversion from '__int64' to 'int', possible loss of data
-C:\Users\super\source\repos\NQueenDemo\NQueenDemo\GASolver.cpp(230): warning C4244: 'initializing': conversion from '__int64' to 'int', possible loss of data
-C:\Users\super\source\repos\NQueenDemo\NQueenDemo\GASolver.cpp(259): warning C4018: '<': signed/unsigned mismatch
-C:\Users\super\source\repos\NQueenDemo\NQueenDemo\GASolver.cpp(270): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-  NQueenDemo.cpp
-C:\Users\super\source\repos\NQueenDemo\NQueenDemo\GASolver.h(11): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-C:\Users\super\source\repos\NQueenDemo\NQueenDemo\NQueenDemoDlg.h(48): warning C4244: 'initializing': conversion from 'double' to 'const int', possible loss of data
-  NQueenDemoDlg.cpp
+﻿  NQueenDemoDlg.cpp
 C:\Users\super\source\repos\NQueenDemo\NQueenDemo\GASolver.h(11): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
 C:\Users\super\source\repos\NQueenDemo\NQueenDemo\NQueenDemoDlg.h(48): warning C4244: 'initializing': conversion from 'double' to 'const int', possible loss of data
 C:\Users\super\source\repos\NQueenDemo\NQueenDemo\NQueenDemoDlg.cpp(280): warning C4018: '<': signed/unsigned mismatch
-  Generating Code...
   NQueenDemo.vcxproj -> C:\Users\super\source\repos\NQueenDemo\Debug\NQueenDemo.exe
