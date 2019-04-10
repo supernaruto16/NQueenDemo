@@ -1,4 +1,5 @@
-﻿  GASolver.cpp
+﻿  pch.cpp
+  GASolver.cpp
 C:\Users\super\source\repos\NQueenDemo\NQueenDemo\GASolver.h(11): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
 C:\Users\super\source\repos\NQueenDemo\NQueenDemo\GASolver.cpp(22): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
 C:\Users\super\source\repos\NQueenDemo\NQueenDemo\GASolver.cpp(36): warning C4018: '<': signed/unsigned mismatch
