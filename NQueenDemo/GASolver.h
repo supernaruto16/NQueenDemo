@@ -36,10 +36,10 @@ public:
 	double GetSelectionProbabilty(Gene &curGene);
 	void GenerateCumulativeDistribution();
 	void GeneratePopulation(int size = 1000);
-	Gene GetParentFromBad(int prevIdx, int &resIdx);
-	Gene GetParentFromMain(int prevIdx, int& resIdx);
+	int GetParentFromBad(int prevIdx);
+	int GetParentFromMain(int prevIdx);
 	void CrossOver();
-	Gene CrossOverMethod(Gene pA, Gene pB);
+	void CrossOverMethod(int pA_idx, int pB_idx, Gene& cC);
 	void Mutation(Gene &curGene);
 	void CreateNewGeneration();
 	bool CheckStopCrt();

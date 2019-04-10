@@ -123,11 +123,11 @@ BOOL CNQueenDemoDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	// TODO: Add extra initialization here
-	m_Board_Size = 8;
-	m_Population_Size = 1000;
-	m_Generation_Limit = 100;
+	m_Board_Size = 10;
+	m_Population_Size = 500;
+	m_Generation_Limit = 1000;
 	m_CrossOverProbabilty = 0.8;
-	m_MutationProbabilty = 0.25;
+	m_MutationProbabilty = 0.36;
 
 	CFont* myFont = new CFont();
 	myFont->CreateFont(16, 0, 0, 0, FW_NORMAL, false, true,
@@ -138,7 +138,7 @@ BOOL CNQueenDemoDlg::OnInitDialog()
 
 	auto pEditBox4 = GetDlgItem(IDC_EDIT4);
 	pEditBox4->EnableWindow(0);
-	auto pEditBox8 = GetDlgItem(IDC_EDIT8);
+	auto pEditBox8 = GetDlgItem(IDC_EDIT8); 
 	pEditBox8->EnableWindow(0);
 
 	UnlockControls();

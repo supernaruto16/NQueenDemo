@@ -106,60 +106,50 @@ void GASolver::GenerateCumulativeDistribution()
 }
 
 
-GASolver::Gene GASolver::GetParentFromBad(int prevIdx, int& resIdx)
+int GASolver::GetParentFromBad(int prevIdx)
 {
-	Gene resGene;
 	int idx = Rand(0, 1000000) % (m_BadPopulation + 1);
 	while (idx == prevIdx) {
 		idx = Rand(0, 1000000) % (m_BadPopulation + 1);
 	}
-	resGene = m_Population[idx];
-	resIdx = idx;
-	return resGene;
+	return idx;
 }
 
 
-GASolver::Gene GASolver::GetParentFromMain(int prevIdx, int& resIdx)
+int GASolver::GetParentFromMain(int prevIdx)
 {
-	Gene resGene;
 	double k;
 	int l, r, mid;
 
 	do {
-		k = (double)Rand(0, 1000000) / 1000000.0;
-		while (k <= m_Population[m_BadPopulation].cumulativeDistribution)
-			k = (double)Rand(0, 1000000) / 1000000.0;
+		k = (double)Rand(m_Population[m_BadPopulation].cumulativeDistribution, 1000000) / 1000000.0;
 
 		l = m_BadPopulation, r = m_Population.size();
 		while (r - l > 1) {
 			mid = (l + r) / 2;
-			if (m_Population[mid].cumulativeDistribution >= k)
-				r = mid;
-			else l = mid;
+			if (m_Population[mid].cumulativeDistribution <= k)
+				l = mid;
+			else r = mid;
 		}
-	} while (r == prevIdx);
+	} while (l == prevIdx);
 
-	resGene = m_Population[r];
-	resIdx = r;
-
-	return resGene;
+	return l;
 }
 
 void GASolver::CrossOver()
 {	
 	m_ChildPopulation.clear();
 	GenerateCumulativeDistribution();
-	Gene parentA, parentB, childC;
 
 	// main & main
 	for (int i = 0; i < m_Population.size() - m_BadPopulation; i++) {
-		int pA_idx = 0, pB_idx = 0;
-		parentA = GetParentFromMain(-1, pA_idx);
-		parentB = GetParentFromMain(pA_idx, pB_idx);
+		int pA_idx = GetParentFromMain(-1);
+		int pB_idx = GetParentFromMain(pA_idx);
 
 		double r = (double)Rand(0, 1000000) / 1000000.0;
 		if (r > m_CrossOverProbability) continue;
-		Gene childC = CrossOverMethod(parentA, parentB);
+		Gene childC;
+		CrossOverMethod(pA_idx, pB_idx, childC);
 
 		r = (double)Rand(0, 1000000) / 1000000.0;
 		if (r <= m_MutationProbability) Mutation(childC);
@@ -168,13 +158,13 @@ void GASolver::CrossOver()
 
 	// bad & bad
 	for (int i = 0; i < m_BadPopulation; i++) {
-		int pA_idx = 0, pB_idx = 0;
-		parentA = GetParentFromBad(-1, pA_idx);
-		parentB = GetParentFromBad(pA_idx, pB_idx);
+		int pA_idx = GetParentFromBad(-1);
+		int pB_idx = GetParentFromBad(pA_idx);
 
 		double r = (double)Rand(0, 1000000) / 1000000.0;
 		if (r > m_CrossOverProbability) continue;
-		Gene childC = CrossOverMethod(parentA, parentB);
+		Gene childC;
+		CrossOverMethod(pA_idx, pB_idx, childC);
 
 		r = (double)Rand(0, 1000000) / 1000000.0;
 		if (r <= m_MutationProbability) Mutation(childC);
@@ -183,13 +173,13 @@ void GASolver::CrossOver()
 
 	// bad & main
 	for (int i = 0; i < m_Population.size() - m_BadPopulation; i++) {
-		int pA_idx = 0, pB_idx = 0;
-		parentA = GetParentFromMain(-1, pA_idx);
-		parentB = GetParentFromBad(-1, pB_idx);
+		int pA_idx = GetParentFromMain(-1);
+		int pB_idx = GetParentFromBad(pA_idx);
 
 		double r = (double)Rand(0, 1000000) / 1000000.0;
 		if (r > m_CrossOverProbability) continue;
-		Gene childC = CrossOverMethod(parentA, parentB);
+		Gene childC;
+		CrossOverMethod(pA_idx, pB_idx, childC);
 
 		r = (double)Rand(0, 1000000) / 1000000.0;
 		if (r <= m_MutationProbability) Mutation(childC);
@@ -198,35 +188,44 @@ void GASolver::CrossOver()
 }
 
 
-GASolver::Gene GASolver::CrossOverMethod(Gene pA, Gene pB)
+void GASolver::CrossOverMethod(int pA_idx, int pB_idx, Gene& cC)
 {	
-	Gene resGene;
-	int l = Rand(0, pA.queensPos.size() - 3);
-	int r = Rand(l + 2, pA.queensPos.size() - 1);
-	for (int i = l; i <= r; i++)
-		m_bUsedPos[pA.queensPos[i]] = true;
-	
-	for (int i = 0, j = 0; resGene.queensPos.size() < pA.queensPos.size(); i++) {
-		if (l <= i && i <= r)
-			resGene.queensPos.push_back(pA.queensPos[i]);
-		else if (j < pB.queensPos.size() && !m_bUsedPos[pB.queensPos[j]]) {
-			resGene.queensPos.push_back(pB.queensPos[j]);
-			j++;
-		}
-		else if(j + 1 < pB.queensPos.size()) j++;
+	int l = Rand(0, m_Population[pA_idx].queensPos.size() - 3);
+	int r = Rand(l + 2, m_Population[pA_idx].queensPos.size() - 1);
+	for (int i = l; i <= r; i++) {
+		int k = m_Population[pA_idx].queensPos[i];
+		m_bUsedPos[k] = true;
 	}
 
-	GetFitness(resGene);
-	for (int i = l; i <= r; i++)
-		m_bUsedPos[pA.queensPos[i]] = false;
+	int i = 0, j = 0;
+	while (i < m_Population[pA_idx].queensPos.size()) {
+		if (l <= i && i <= r) {
+			int k = m_Population[pA_idx].queensPos[i];
+			cC.queensPos.push_back(k);
+			i++;
+		}
+		else
+		{ 
+			int k = m_Population[pB_idx].queensPos[j];
+			if (j < m_Population[pB_idx].queensPos.size() && !m_bUsedPos[k]) {
+				cC.queensPos.push_back(k);
+				j++, i++;
+			}
+			else j++;
+		}
+	}
 
-	return resGene;
+	GetFitness(cC);
+	for (int i = l; i <= r; i++) {
+		int k = m_Population[pA_idx].queensPos[i];
+		m_bUsedPos[k] = false;
+	}
 }
 
 void GASolver::Mutation(Gene &curGene)
 {
 	int i = Rand(0, curGene.queensPos.size() - 2);
-	int j = Rand(i+1, curGene.queensPos.size() - 1);
+	int j = Rand(i + 1, curGene.queensPos.size() - 1);
 	std::swap(curGene.queensPos[i], curGene.queensPos[j]);
 	GetFitness(curGene);
 }
@@ -239,17 +238,18 @@ void GASolver::CreateNewGeneration()
 	std::sort(m_ChildPopulation.begin(), m_ChildPopulation.end(), fitnessCMP);
 	int i = m_Population.size() - 1;
 	int j = m_ChildPopulation.size() - 1;
-	while (i >= 0 && j >= 0) {
-		if (m_Population[i].fitness < m_ChildPopulation[j].fitness) {
+	while (i >= 0 || j >= 0) {
+		if (i >= 0 && m_Population[i].fitness < m_ChildPopulation[j].fitness) {
 			resPopulation.push_back(m_Population[i]);
 			i--;
 		}
-		else {
+		else if (j >= 0) {
 			resPopulation.push_back(m_ChildPopulation[j]);
 			j--;
 		}
 		if (resPopulation.size() == m_Population_Size) break;
 	}
+	m_Population.clear();
 	m_Population = resPopulation;
 }
 
