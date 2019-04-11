@@ -2,6 +2,8 @@
 
 Project using Genetic Algorithm to solve N-Queens Problem
 
+Slides: https://docs.google.com/presentation/d/1nbGmYfKA5cmqj4TdbV3v46rgY-Qm6KoTI5vqHo8MU-U/edit?usp=sharing
+
 Language: C++
 
 Framework: MFC
