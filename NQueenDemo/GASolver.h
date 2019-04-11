@@ -12,7 +12,7 @@ private:
 	int m_SumFitness;
 	double m_CrossOverProbability = 0.8;
 	double m_MutationProbability = 0.25;
-	bool m_bUsedPos[1000] = { 0 };
+	bool m_bUsedPos[10010] = { 0 };
 
 	struct Gene {
 		std::vector<int> queensPos;
@@ -22,6 +22,7 @@ private:
 	};
 	std::vector<Gene> m_Population;
 	std::vector<Gene> m_ChildPopulation;
+	std::vector<Gene> m_ResPopulation;
 	std::vector<int> m_Result;
 
 public:

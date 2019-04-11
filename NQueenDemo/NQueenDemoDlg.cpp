@@ -264,6 +264,7 @@ void CNQueenDemoDlg::OnBnClickedButton1()
 
 	m_hKillEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
 	m_hThread = AfxBeginThread(ThreadProcGASolver, this);
+	//ThreadProcGASolverRun();
 }
 
 

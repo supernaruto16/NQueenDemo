@@ -50,7 +50,7 @@ int GASolver::GetFitness(Gene &curGene)
 
 void GASolver::GeneratePopulation(int size)
 {
-	std:: vector<int> zero;
+	std::vector<int> zero;
 	for (int i = 0; i < m_Board_Size; i++)
 		zero.push_back(i);
 
@@ -93,7 +93,6 @@ double GASolver::GetSelectionProbabilty(Gene &curGene)
 	return curGene.selectionProbability;
 }
 
-
 void GASolver::GenerateCumulativeDistribution()
 {
 	GetSumFitness();
@@ -108,21 +107,20 @@ void GASolver::GenerateCumulativeDistribution()
 
 int GASolver::GetParentFromBad(int prevIdx)
 {
-	int idx = Rand(0, 1000000) % (m_BadPopulation + 1);
-	while (idx == prevIdx) {
+	int idx;
+	do {
 		idx = Rand(0, 1000000) % (m_BadPopulation + 1);
-	}
+	} while (idx == prevIdx);
 	return idx;
 }
-
 
 int GASolver::GetParentFromMain(int prevIdx)
 {
 	double k;
 	int l, r, mid;
-
 	do {
-		k = (double)Rand(m_Population[m_BadPopulation].cumulativeDistribution, 1000000) / 1000000.0;
+		int k1 = m_Population[m_BadPopulation].cumulativeDistribution * 1000000 + 1;
+		k = (double)Rand(k1, 1000000) / 1000000.0;
 
 		l = m_BadPopulation, r = m_Population.size();
 		while (r - l > 1) {
@@ -153,6 +151,8 @@ void GASolver::CrossOver()
 
 		r = (double)Rand(0, 1000000) / 1000000.0;
 		if (r <= m_MutationProbability) Mutation(childC);
+
+		GetFitness(childC);
 		m_ChildPopulation.push_back(childC);
 	}
 
@@ -168,13 +168,15 @@ void GASolver::CrossOver()
 
 		r = (double)Rand(0, 1000000) / 1000000.0;
 		if (r <= m_MutationProbability) Mutation(childC);
+
+		GetFitness(childC);
 		m_ChildPopulation.push_back(childC);
 	}
 
 	// bad & main
 	for (int i = 0; i < m_Population.size() - m_BadPopulation; i++) {
 		int pA_idx = GetParentFromMain(-1);
-		int pB_idx = GetParentFromBad(pA_idx);
+		int pB_idx = GetParentFromBad(-1);
 
 		double r = (double)Rand(0, 1000000) / 1000000.0;
 		if (r > m_CrossOverProbability) continue;
@@ -183,6 +185,8 @@ void GASolver::CrossOver()
 
 		r = (double)Rand(0, 1000000) / 1000000.0;
 		if (r <= m_MutationProbability) Mutation(childC);
+
+		GetFitness(childC);
 		m_ChildPopulation.push_back(childC);
 	}
 }
@@ -190,32 +194,34 @@ void GASolver::CrossOver()
 
 void GASolver::CrossOverMethod(int pA_idx, int pB_idx, Gene& cC)
 {	
-	int l = Rand(0, m_Population[pA_idx].queensPos.size() - 3);
-	int r = Rand(l + 2, m_Population[pA_idx].queensPos.size() - 1);
+	int l = Rand(0, m_Population[pA_idx].queensPos.size() - 2);
+	int r = Rand(l + 1, m_Population[pA_idx].queensPos.size() - 1);
+
 	for (int i = l; i <= r; i++) {
 		int k = m_Population[pA_idx].queensPos[i];
 		m_bUsedPos[k] = true;
 	}
 
 	int i = 0, j = 0;
-	while (i < m_Population[pA_idx].queensPos.size()) {
+
+	while (i < m_Board_Size) {
+		int k = 0;
 		if (l <= i && i <= r) {
-			int k = m_Population[pA_idx].queensPos[i];
+			k = m_Population[pA_idx].queensPos[i];
 			cC.queensPos.push_back(k);
-			i++;
 		}
-		else
-		{ 
-			int k = m_Population[pB_idx].queensPos[j];
-			if (j < m_Population[pB_idx].queensPos.size() && !m_bUsedPos[k]) {
+		else if (j < m_Board_Size) {
+			do {
+				k = m_Population[pB_idx].queensPos[j];
+				++j;
+			} while (j < m_Board_Size && m_bUsedPos[k]);
+
+			if (!m_bUsedPos[k])
 				cC.queensPos.push_back(k);
-				j++, i++;
-			}
-			else j++;
 		}
+		i++;
 	}
 
-	GetFitness(cC);
 	for (int i = l; i <= r; i++) {
 		int k = m_Population[pA_idx].queensPos[i];
 		m_bUsedPos[k] = false;
@@ -227,34 +233,36 @@ void GASolver::Mutation(Gene &curGene)
 	int i = Rand(0, curGene.queensPos.size() - 2);
 	int j = Rand(i + 1, curGene.queensPos.size() - 1);
 	std::swap(curGene.queensPos[i], curGene.queensPos[j]);
-	GetFitness(curGene);
 }
 
 void GASolver::CreateNewGeneration()
 {
-	std::vector<Gene> resPopulation;
+	m_ResPopulation.clear();
 	CrossOver();
 	std::sort(m_Population.begin(), m_Population.end(), fitnessCMP);
 	std::sort(m_ChildPopulation.begin(), m_ChildPopulation.end(), fitnessCMP);
+
 	int i = m_Population.size() - 1;
 	int j = m_ChildPopulation.size() - 1;
 	while (i >= 0 || j >= 0) {
 		if (i >= 0 && m_Population[i].fitness < m_ChildPopulation[j].fitness) {
-			resPopulation.push_back(m_Population[i]);
+			m_ResPopulation.push_back(m_Population[i]);
 			i--;
 		}
 		else if (j >= 0) {
-			resPopulation.push_back(m_ChildPopulation[j]);
+			m_ResPopulation.push_back(m_ChildPopulation[j]);
 			j--;
 		}
-		if (resPopulation.size() == m_Population_Size) break;
+		if (m_ResPopulation.size() == m_Population_Size) break;
 	}
 	m_Population.clear();
-	m_Population = resPopulation;
+	m_Population = m_ResPopulation;
+
 }
 
 bool GASolver::CheckStopCrt()
 {
+	if (m_Board_Size < 4 && m_Board_Size != 1) return true;
 	if (genCnt == m_GenerationLimit) return true;
 	for (int i = 0; i < m_Population.size(); i++)
 		if (m_Population[i].fitness == 0) {
